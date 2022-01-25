@@ -35,7 +35,8 @@ function Titulo(props){
 */}
 export default function PaginaInicial() {
     //const username = 'raphael-ramos';
-    const [username, setUsername] = React.useState('raphael-ramos');
+    const [username, setUsername] = React.useState(null);
+    const [lengUsername, setLengUsername] = React.useState(true);
     const roteamento = useRouter();
   
     return (
@@ -99,6 +100,7 @@ export default function PaginaInicial() {
                   const valor = event.target.value
                   //trocar o valor da variavel
                   setUsername(valor)
+                  valor.length < 2 ? setLengUsername(true) :  setLengUsername(false)
                 }}
               />
               <Button
@@ -111,12 +113,14 @@ export default function PaginaInicial() {
                   mainColorLight: appConfig.theme.colors.primary[400],
                   mainColorStrong: appConfig.theme.colors.primary[600],
                 }}
+                disabled={lengUsername}
               />
             </Box>
             {/* Formulário */}
   
   
             {/* Photo Area */}
+            
             <Box
               styleSheet={{
                 display: 'flex',
@@ -132,6 +136,8 @@ export default function PaginaInicial() {
                 minHeight: '240px',
               }}
             >
+              {username.length >= 2 ?
+              <>
               <Image
                 styleSheet={{
                   borderRadius: '50%',
@@ -150,6 +156,8 @@ export default function PaginaInicial() {
               >
                 {username}
               </Text>
+              </>
+              : <div></div>}
             </Box>
             {/* Photo Area */}
           </Box>
