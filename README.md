@@ -7,9 +7,11 @@
 	🚧 Em construção...  🚧
 </h4>
 
-###Tecnologias utilizadas
+### Tecnologias utilizadas
+
 - [React](https://pt-br.reactjs.org/)
 - [Next.js](https://nextjs.org/)
 - [Styled jsx](https://github.com/vercel/styled-jsx)
 - [SkynexUi](https://storybook.skynexui.dev/?path=/story/introduction--page)
+- [Supabase](https://supabase.com/)
 
