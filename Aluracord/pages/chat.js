@@ -2,22 +2,54 @@ import { Box, Text, TextField, Image, Button } from '@skynexui/components';
 import React from 'react';
 import appConfig from '../config.json';
 
+import supabaseClient from '../src/services/auth'; //importa as configurações de conexão do supabase
+
+// import {createClient} from '@supabase/supabase-js';
+/* 
+const SUPABASE_ANON_KEY = 'key anonima (importada do arquivo de autenticação auth.js)';
+const SUPABASE_URL = 'url da api (importada do arquivo de autenticação auth.js) ';
+const supabaseClient = createClient(SUPABASE_URL,SUPABASE_ANON_KEY); 
+*/
+
+
 export default function PaginaDoChat() {
+    
     // Sua lógica vai aqui
     const [mensagem, setMensagem] = React.useState('');
-
     const [listaMensagens, setListaMensagens] = React.useState([]);
+
+    /* o useEffect por padrão é executado sempre quando a página carrega
+    caso seja necessário chamar novamente a requisição do useEffect 
+    é necessário informar no array qual o item que ele tem que observar, 
+    quando o item for mudado ele executará a chamada dentro do useEffect */
+    React.useEffect(() => {
+        supabaseClient
+            .from('mensagens')
+            .select('*')
+            .order('created_at', {ascending:false})
+            .then(({data}) => {
+                console.log(data);
+                setListaMensagens(data);
+            });
+    },[]);
 
     function handleNovaMensagem(novaMensagem) {
         const mensagem = {
-            id: listaMensagens.length + 1,
+            // id: listaMensagens.length + 1,
             texto: novaMensagem,
             de: 'vanessametonini',
         }
-        setListaMensagens([
-            mensagem,
-            ...listaMensagens,
-        ])
+
+        supabaseClient
+            .from('mensagens')
+            .insert([mensagem])
+            .then(({data}) => {
+                console.log('Criando mensagem',data);
+                setListaMensagens([
+                    data[0],
+                    ...listaMensagens,
+                ])
+            })
         setMensagem('');
     }
 
@@ -122,12 +154,12 @@ function Header() {
 }
 
 function MessageList(props) {
-    console.log('mensagens', props.mensagens);
+    //console.log('mensagens', props.mensagens);
     return (
         <Box
             tag="ul"
             styleSheet={{
-                overflow: 'scroll',
+                overflowY: 'scroll',
                 display: 'flex',
                 flexDirection: 'column-reverse',
                 flex: 1,
@@ -163,7 +195,7 @@ function MessageList(props) {
                                     display: 'inline-block',
                                     marginRight: '8px',
                                 }}
-                                src={`https://github.com/vanessametonini.png`}
+                                src={`https://github.com/${mensagem.de}.png`}
                             />
                             <Text tag="strong">
                                 {mensagem.de}
