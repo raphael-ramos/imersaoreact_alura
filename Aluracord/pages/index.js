@@ -45,7 +45,7 @@ export default function PaginaInicial() {
           styleSheet={{
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             backgroundColor: appConfig.theme.colors.neutrals[400],
-            backgroundImage: 'url(https://s2.glbimg.com/iQN7JI_QDQWYQpKVyLrnYc-fPWk=/smart/e.glbimg.com/og/ed/f/original/2021/08/28/f1.jpeg)',
+            backgroundImage: 'url(https://www.gannett-cdn.com/-mm-/94c7c3263aa8db17e1a3076e2c2fbe079680d607/c=0-148-4348-2605/local/-/media/2015/09/18/Indianapolis/B9318916127Z.1_20150918183344_000_G2QBVIM1U.1-0.jpg?width=3200&height=1809&fit=crop&format=pjpg&auto=webp)',
             backgroundRepeat: 'no-repeat', backgroundSize: 'cover', backgroundBlendMode: 'multiply',
           }}
         >
@@ -69,7 +69,7 @@ export default function PaginaInicial() {
               as="form"
               onSubmit={function (infosDoEvento){
                 infosDoEvento.preventDefault(); //previne do comportamento default de um submit (redirecionar o submit para uma página em caso do submit)
-                roteamento.push('/chat');
+                roteamento.push(`/chat?username=${username}`);
                 
                 // window.location.href = '/chat'; //redireciona para a página especificada (recarregando a página)
               }}

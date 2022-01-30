@@ -1,8 +1,11 @@
 import { Box, Text, TextField, Image, Button } from '@skynexui/components';
 import React from 'react';
 import appConfig from '../config.json';
+import {useRouter} from 'next/router';
 
 import supabaseClient from '../src/services/auth'; //importa as configurações de conexão do supabase
+
+import {ButtonSendSticker} from '../src/components/ButtonSendSticker';
 
 // import {createClient} from '@supabase/supabase-js';
 /* 
@@ -11,12 +14,30 @@ const SUPABASE_URL = 'url da api (importada do arquivo de autenticação auth.js
 const supabaseClient = createClient(SUPABASE_URL,SUPABASE_ANON_KEY); 
 */
 
+function escutaMensagensEmTempoReal(adicionaMensagem){
+    return supabaseClient
+        .from('mensagens')
+        .on('INSERT', (respostaLive) => {
+            adicionaMensagem(respostaLive.new);
+            console.log('Nova Mensagem')
+            console.log(respostaLive.new);
+        })
+        .subscribe();
+};
 
 export default function PaginaDoChat() {
+    const roteamento = useRouter();
+    const usuarioLogado = roteamento.query.username;
     
     // Sua lógica vai aqui
     const [mensagem, setMensagem] = React.useState('');
-    const [listaMensagens, setListaMensagens] = React.useState([]);
+    const [listaMensagens, setListaMensagens] = React.useState([
+        // {
+        //     id:1,
+        //     de: 'raphael-ramos',
+        //     texto:':sticker:https://www.alura.com.br/imersao-react-4/assets/figurinhas/Figurinha_1.png'
+        // }     
+    ]);
 
     /* o useEffect por padrão é executado sempre quando a página carrega
     caso seja necessário chamar novamente a requisição do useEffect 
@@ -31,13 +52,22 @@ export default function PaginaDoChat() {
                 console.log(data);
                 setListaMensagens(data);
             });
+
+        escutaMensagensEmTempoReal((novaMensagem) => {
+            setListaMensagens((valorAtualDaLista) => {
+                return [
+                    novaMensagem,
+                    ...valorAtualDaLista,
+                ]
+            });
+        });
     },[]);
 
     function handleNovaMensagem(novaMensagem) {
         const mensagem = {
             // id: listaMensagens.length + 1,
             texto: novaMensagem,
-            de: 'vanessametonini',
+            de: usuarioLogado,
         }
 
         supabaseClient
@@ -45,10 +75,7 @@ export default function PaginaDoChat() {
             .insert([mensagem])
             .then(({data}) => {
                 console.log('Criando mensagem',data);
-                setListaMensagens([
-                    data[0],
-                    ...listaMensagens,
-                ])
+                
             })
         setMensagem('');
     }
@@ -126,6 +153,13 @@ export default function PaginaDoChat() {
                                 backgroundColor: appConfig.theme.colors.neutrals[800],
                                 marginRight: '12px',
                                 color: appConfig.theme.colors.neutrals[200],
+                            }}
+                        />
+                        {/* callback */}
+                        <ButtonSendSticker
+                            onStickerClick={(sticker)=>{
+                                console.log(('[USANDO O COMPONENTE]Salva o Sticker no banco'));
+                                handleNovaMensagem (':sticker:' + sticker);
                             }}
                         />
                     </Box>
@@ -211,7 +245,17 @@ function MessageList(props) {
                                 {(new Date().toLocaleDateString())}
                             </Text>
                         </Box>
-                        {mensagem.texto}
+                        {mensagem.texto.startsWith(':sticker:') 
+                        ? 
+                            (
+                                 <Image src={mensagem.texto.replace(':sticker:','')}></Image>
+                            )
+                        :
+                            (
+                                mensagem.texto
+                            )
+                        }   
+                        
                     </Text>
                 )
             })}
